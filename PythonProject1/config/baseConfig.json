@@ -1,0 +1,13 @@
+{
+  "chrome_driver_path": "D:\\self\\chromedriver-win64\\chromedriver.exe",
+  "isPrivacy": true,
+  "timeOut": 60,
+  "TonPath" : "../record/Ton.txt",
+  "regisiterPath" : "../record/regisiter.txt",
+  "spiderPath" : "../record/spiderAddr.txt",
+  "failPath" : "../record/fail.txt",
+  "successPath" : "../record/success.txt",
+  "mobile": false,
+  "inviteUrl": "https://web.redspider.space/#/pages/login/login?share=SZ25VY",
+  "receiveId": "4518054bdcd6e68ce5d4cf35d2a52dd76e147841"
+}
