@@ -15,7 +15,7 @@ class RequestClient:
     def __init__(self,
                  base_headers: Optional[Dict] = None,
                  timeout: int = 10,
-                 verify_ssl: bool = False):
+                 verify_ssl: bool = True):
         """
         初始化HTTP客户端
         :param base_headers: 基础协议头（会被后续请求继承）

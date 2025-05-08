@@ -5,7 +5,6 @@ import pyperclip
 import pytest
 import requests
 from selenium.webdriver.common.by import By
-
 from utils.seleniumUtils import driverUtils, log, addContent, parseTxtFile, getNowTime, parseTonText, delete_line,aes_decrypt,aes_encrypt,md5_encrypt
 from utils._http import RequestClient
 
@@ -305,11 +304,13 @@ def test_mine(token):
             miningCount = miningCount - len(zeroArr)
         log(f"正在选择上架矿工")
         jackArr, petterArr, zeroArr = test_myMiner(token)
+        # mindCount是空余坑位 最大坑位-在挖坑位
         mindCount = limitCount - miningCount
         if mindCount == 0:
             log("所有矿坑正在正常工作")
         else:
             minerStr = ""
+            # 空余坑位-jack数量 若小于零则全放jack，若大于零则为放jack数量+jackCount(peter数量)
             jackCount = mindCount - len(jackArr)
             if jackCount < 0:
                 for i in range(mindCount):
@@ -318,24 +319,29 @@ def test_mine(token):
                     else:
                         minerStr = minerStr + jackArr[i]
             else:
+                # peter的需求量 - peter的已有量
+                # 若小于0则放peterCount个peter数量和jack数量
+                # 若大于0则放 peter的已有量 和 jack数量
                 peterCount = jackCount-len(petterArr)
                 if peterCount < 0:
-                    for i in range(len(jackArr)):
-                        if i != len(jackArr)-1:
-                            minerStr = minerStr+jackArr[i]+","
-                        else:
-                            minerStr = minerStr + jackArr[i]
-                    for i in range(jackCount):
-                        if i != len(jackCount)-1:
+                    if len(jackArr) != 0:
+                        for i in range(len(jackArr)):
+                            if i != len(jackArr)-1:
+                                minerStr = minerStr+jackArr[i]+","
+                            else:
+                                minerStr = minerStr + jackArr[i]
+                    for i in range(len(petterArr)):
+                        if i != len(petterArr)-1:
                             minerStr = minerStr+petterArr[i]+","
                         else:
                             minerStr = minerStr + petterArr[i]
                 else:
-                    for i in range(len(jackArr)):
-                        if i != len(jackArr)-1:
-                            minerStr = minerStr+jackArr[i]+","
-                        else:
-                            minerStr = minerStr + jackArr[i]
+                    if len(jackArr) != 0:
+                        for i in range(len(jackArr)):
+                            if i != len(jackArr)-1:
+                                minerStr = minerStr+jackArr[i]+","
+                            else:
+                                minerStr = minerStr + jackArr[i]
                     for i in range(len(petterArr)):
                         if i != len(petterArr)-1:
                             minerStr = minerStr+petterArr[i]+","
@@ -353,15 +359,6 @@ def test_batchRegisiter():
         test_regisiter(lines[count-i-1])
         delete_line(TonPath,count-i)
 
-def test_batchLogin():
-    regisiterTXT = parseTxtFile(regisiterPath)
-    count = regisiterTXT.get("count")
-    lines = regisiterTXT.get("lines")
-    for i in range(int(count)):
-        account = lines[i]
-        accountWord = account[2]
-        # 开始养号
-        test_login(accountWord)
 
 def test_batchAdopt():
     successCount = 0
@@ -394,12 +391,12 @@ def test_batchAdopt():
             log(f"，正在购买蜘蛛,可以购买{buyCount}次蜘蛛")
             for i in range(buyCount):
                 test_buy(token)
-                time.sleep(0.5)
+                time.sleep(1)
             log(f"蜘蛛购买完成，正在买矿池")
             test_unlock(token)
-            time.sleep(0.5)
+            time.sleep(1)
             test_unlock(token)
-            time.sleep(0.5)
+            time.sleep(1)
             test_unlock(token)
             log(f"买矿完成，正在更换矿工")
             test_mine(token)
