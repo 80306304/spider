@@ -1,2 +1,9 @@
-# spider
-集成框架完成蜘蛛世界全自动注册/养号脚本
+# spider游戏全自动全套脚本
+本脚本主要利用python的selenium库完成注册自动化，用requests库以及各种加密库完成登录、挖矿、自动判断矿坑情况上下矿工
+
+使用方法:
+导入pythonProject1文件，运行project.py下的test_batchRegisiter即可完成注册功能，运行test_batchAdopt完成养号功能
+
+注册前需要在Ton.txt里放入地址，一行一个
+
+登录会读取regisiter.txt里的数据，成功的会放到success.txt，失败的会放到fail.txt
