@@ -393,11 +393,11 @@ def test_batchAdopt():
             print("\n")
             continue;
         else:
-            score,siw = test_userInfo(token)
             log(f"登陆成功,token为{token}")
             log(f"正在签到")
             test_usermining(token)
             log(f"签到已完成,正在进行转账")
+            score,siw = test_userInfo(token)
             test_sendSiw(receiveId,siw,token)
             test_sendZuanshi(receiveId,score,token)
             buyCount = int(int(score.replace(',', ''))//480)
