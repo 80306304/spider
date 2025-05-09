@@ -67,6 +67,16 @@ def test_sendSiw(receiveId:str="4518054bdcd6e68ce5d4cf35d2a52dd76e147841",giveNu
     res = client.post(url=url,json=aes_data,headers=setHeader(data,token))
     log(res.get("content"))
 
+def test_sendZuanshi(receiveId:str="4518054bdcd6e68ce5d4cf35d2a52dd76e147841",giveNum:str="240",token:str="7018d2fa-3aad-43a0-93d9-924928f0f68d"):
+    if giveNum == "0.00":
+        log("无余额可转")
+        return
+    url = "https://siw.spiderweb.work/api/user/zuanshiGive"
+    data = '{"receiveId":"'+receiveId+'","giveNum":"'+giveNum+'","fnejnreoi":"1234567891234567"}'
+    aes_data = setData(data)
+    res = client.post(url=url,json=aes_data,headers=setHeader(data,token))
+    log(res.get("content"))
+
 def test_regisiter(TonAddr):
     driver = driverUtils().begin()
     driver.get(inviteUrl)
@@ -289,6 +299,8 @@ def test_batchMiner(ids:str="45535",token:str="8e1751a3-638c-465d-ad3a-db5bed91a
 
 def test_mine(token):
     limitCount, miningCount, zeroArr = test_mining(token)
+    limitCount = int(limitCount)
+    miningCount = int(miningCount)
     if limitCount-miningCount == 0 and len(zeroArr) == 0:
         log("矿场状态正常")
     else:
@@ -382,12 +394,13 @@ def test_batchAdopt():
             continue;
         else:
             score,siw = test_userInfo(token)
-            buyCount = int(int(score.replace(',', ''))//480)
             log(f"登陆成功,token为{token}")
             log(f"正在签到")
             test_usermining(token)
             log(f"签到已完成,正在进行转账")
             test_sendSiw(receiveId,siw,token)
+            test_sendZuanshi(receiveId,score,token)
+            buyCount = int(int(score.replace(',', ''))//480)
             log(f"，正在购买蜘蛛,可以购买{buyCount}次蜘蛛")
             for i in range(buyCount):
                 test_buy(token)
@@ -405,7 +418,7 @@ def test_batchAdopt():
             addContent(successPath, txt)
             print("\n")
     print(f"共养号{count}个，成功{successCount}个，失败{failCount}个")
-
+    pass
 
 if __name__ == '__main__':
     pytest.main()

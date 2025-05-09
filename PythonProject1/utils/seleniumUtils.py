@@ -219,8 +219,13 @@ if __name__ == '__main__':
     #print(aes_encrypt(str(aes_u),"123V5c78912j4F6r","1234567891234567"))
 
 
-    data = '{data:sEWywWmGaMBl3RGOBsaqC/6q+cMdYfPiZeTpWGoPCOQ+fS6LgPJyp9ysjTDBgGHZAC8IiumTPyhkQzPafv1WQdKFZ8oosKb52tn836pyqwFwRF/VQ6CRt/r4rbSiLhHdx1PIHwAZctwbsuLqgZmsH+c862pngJpde9W+fFmI+peeRRQSipyz973jzgRujCb8T1hOGA63YS7cCKZVLV8Lh0OM+1/QYnbKup8Y20k7Hks=}'
-
-    response = requests.post('https://siw.spiderweb.work/api/user/login', headers=headers, data=data)
-    print(response.text)
-
+    # data = '{data:sEWywWmGaMBl3RGOBsaqC/6q+cMdYfPiZeTpWGoPCOQ+fS6LgPJyp9ysjTDBgGHZAC8IiumTPyhkQzPafv1WQdKFZ8oosKb52tn836pyqwFwRF/VQ6CRt/r4rbSiLhHdx1PIHwAZctwbsuLqgZmsH+c862pngJpde9W+fFmI+peeRRQSipyz973jzgRujCb8T1hOGA63YS7cCKZVLV8Lh0OM+1/QYnbKup8Y20k7Hks=}'
+    #
+    # response = requests.post('https://siw.spiderweb.work/api/user/login', headers=headers, data=data)
+    # print(response.text)
+    req_aes_key = "123V5c78912j4F6r"
+    req_aes_IV = "1234567891234567"
+    res_aes_key = "0123456789abcdef"
+    res_aes_IV = "1234567890abcdef"
+    data = "Y5Kqz96dIfaGDAL1Kjw+IbWZOdXyGpEu9ftHqc9923KUAmUxA59AhRuq8irG8assRU2RxbaRoo0aAHYW5icwxk3VVGO6wULVjcSRbnqsNkCBlQayvIcfiGwAWPQll+TP"
+    print(aes_decrypt(data, req_aes_key, req_aes_IV))
