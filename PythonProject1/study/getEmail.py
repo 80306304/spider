@@ -1,112 +1,111 @@
-import poplib
-from email.parser import BytesParser
+import imaplib
+import email
 from email.header import decode_header
-from typing import List
+from email.utils import parsedate_to_datetime
 
 
-def decode_email_header(header: str) -> str:
-    """解码邮件头中的乱码（如中文）"""
-    decoded = decode_header(header)
-    result = []
-    for part, charset in decoded:
-        if charset:
-            part = part.decode(charset) if isinstance(part, bytes) else part
-        result.append(str(part))
-    return ''.join(result)
-
-
-def fetch_emails(
-        pop_server: str,
-        pop_port: int,
-        email_addr: str,
-        password: str,
-        count: int = 3  # 获取最近3封邮件
-) -> List[dict]:
+def get_qq_email(username, password, folder='INBOX', num=5):
     """
-    使用POP3协议获取邮件
-
-    :param pop_server: POP3服务器地址（如pop.qq.com）
-    :param pop_port: POP3端口（如995/SSL）
-    :param email_addr: 邮箱地址
-    :param password: 邮箱授权码（非登录密码）
-    :param count: 获取最近的邮件数量
-    :return: 邮件信息列表（包含主题、发件人、正文等）
+    获取QQ邮箱指定文件夹的最新邮件
+    :param username: QQ邮箱地址（如：xxx@qq.com）
+    :param password: QQ邮箱IMAP授权码（非登录密码）
+    :param folder: 邮箱文件夹（默认收件箱）
+    :param num: 获取最新邮件数量（默认5封）
+    :return: 邮件列表（包含主题、发件人、时间、正文）
     """
-    emails = []
+    # 连接QQ邮箱IMAP服务器（SSL加密）
     try:
-        # 连接到POP3服务器（SSL加密）
-        with poplib.POP3_SSL(pop_server, pop_port) as server:
-            # 登录
-            server.user(email_addr)
-            server.pass_(password)
-
-            # 获取邮件数量和总大小
-            msg_count, msg_total_size = server.stat()
-            print(f"📮 服务器共有 {msg_count} 封邮件，总大小 {msg_total_size} bytes")
-
-            # 获取最近的N封邮件（索引从1开始，倒序取最后count封）
-            start_idx = max(1, msg_count - count + 1)
-            for idx in range(start_idx, msg_count + 1):
-                # 获取邮件原始字节数据
-                resp, lines, octets = server.retr(idx)
-                raw_email = b'\r\n'.join(lines)
-
-                # 解析邮件内容
-                parser = BytesParser()
-                msg = parser.parsebytes(raw_email)
-
-                # 提取关键信息
-                email_info = {
-                    "id": idx,
-                    "subject": decode_email_header(msg["Subject"]),
-                    "from": decode_email_header(msg["From"]),
-                    "to": decode_email_header(msg["To"]),
-                    "date": msg["Date"],
-                    "body": ""
-                }
-
-                # 解析正文（处理纯文本或HTML）
-                if msg.is_multipart():
-                    for part in msg.get_payload():
-                        if part.get_content_type() == 'text/plain':
-                            charset = part.get_content_charset() or 'utf-8'
-                            email_info["body"] += part.get_payload(decode=True).decode(charset, 'ignore')
-                else:
-                    charset = msg.get_content_charset() or 'utf-8'
-                    email_info["body"] = msg.get_payload(decode=True).decode(charset, 'ignore')
-
-                emails.append(email_info)
-                print(f"✅ 已获取第 {idx} 封邮件：{email_info['subject']}")
-
-            return emails
-
-    except poplib.error_proto as e:
-        print(f"\n⚠️ POP3协议错误: {str(e)}")
+        mail = imaplib.IMAP4_SSL('imap.qq.com', 993)
     except Exception as e:
-        print(f"\n⚠️ 发生未预期错误: {str(e)}")
+        print(f"连接服务器失败: {str(e)}")
+        return []
+
+    # 登录邮箱
+    try:
+        mail.login(username, password)
+    except imaplib.IMAP4.error as e:
+        print(f"登录失败: {str(e)}。请检查授权码是否正确")
+        mail.logout()
+        return []
+
+    # 选择邮箱文件夹
+    try:
+        mail.select(folder)
+    except imaplib.IMAP4.error as e:
+        print(f"选择文件夹失败: {str(e)}")
+        mail.logout()
+        return []
+
+    # 搜索最新的num封邮件（按接收时间倒序）
+    try:
+        _, data = mail.search(None, 'ALL')
+        mail_ids = data[0].split()[-num:]  # 取最后num个邮件ID（最新）
+    except Exception as e:
+        print(f"搜索邮件失败: {str(e)}")
+        mail.logout()
+        return []
+
+    emails = []
+    # 遍历获取邮件内容
+    for mail_id in reversed(mail_ids):  # 反转顺序保持时间正序
+        try:
+            _, data = mail.fetch(mail_id, '(RFC822)')
+            raw_email = data[0][1]
+            msg = email.message_from_bytes(raw_email)
+        except Exception as e:
+            print(f"获取邮件{mail_id}失败: {str(e)}")
+            continue
+
+        # 解析邮件主题
+        subject, encoding = decode_header(msg['Subject'])[0]
+        if encoding:
+            subject = subject.decode(encoding)
+
+        # 解析发件人
+        from_addr = msg['From']
+        if '>' in from_addr:
+            from_addr = from_addr.split('>')[1].strip().strip('<')
+
+        # 解析时间（转换为北京时间）
+        try:
+            mail_time = parsedate_to_datetime(msg['Date']).astimezone()
+        except:
+            mail_time = '未知时间'
+
+        # 解析正文内容
+        body = ''
+        if msg.is_multipart():
+            for part in msg.get_payload():
+                if part.get_content_type() == 'text/plain':
+                    charset = part.get_charset() or 'utf-8'
+                    body += part.get_payload(decode=True).decode(charset, 'ignore')
+        else:
+            charset = msg.get_charset() or 'utf-8'
+            body = msg.get_payload(decode=True).decode(charset, 'ignore')
+
+        emails.append({
+            'subject': subject,
+            'from': from_addr,
+            'time': str(mail_time),
+            'body': body.strip()[:500]  # 取前500字
+        })
+
+    mail.logout()
     return emails
 
 
 if __name__ == "__main__":
-    # 配置信息（请替换成你自己的信息）
-    config = {
-        "pop_server": "pop.qq.com",  # QQ邮箱POP3服务器
-        "pop_port": 995,  # QQ邮箱POP3-SSL端口
-        "email_addr": "80306304@qq.com",  # 你的邮箱
-        "password": "yaugwzlqvaivbgij",  # 邮箱授权码（非登录密码）
-        "count": 3  # 获取最近3封邮件
-    }
+    # 请替换为你的QQ邮箱信息
+    QQ_EMAIL = "80306304@qq.com"  # 你的QQ邮箱地址
+    AUTH_CODE = "yaugwzlqvaivbgij"  # 你的IMAP授权码
 
-    print("=== 开始接收邮件 ===")
-    received_emails = fetch_emails(**config)
+    # 获取最新5封收件箱邮件
+    latest_emails = get_qq_email(QQ_EMAIL, AUTH_CODE)
 
-    if received_emails:
-        print("\n=== 邮件列表 ===")
-        for idx, email in enumerate(received_emails, 1):
-            print(f"\n邮件 {idx}:")
-            print(f"主题: {email['subject']}")
-            print(f"发件人: {email['from']}")
-            print(f"时间: {email['date']}")
-            print(f"正文: {email['body'][:100]}...（截断显示）")
-    else:
-        print("\nℹ️ 未获取到邮件")
+    # 打印结果
+    for idx, email_info in enumerate(latest_emails, 1):
+        print(f"\n=== 第{idx}封邮件 ===")
+        print(f"主题: {email_info['subject']}")
+        print(f"发件人: {email_info['from']}")
+        print(f"时间: {email_info['time']}")
+        print(f"正文: {email_info['body']}...")

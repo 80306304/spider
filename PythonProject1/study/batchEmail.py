@@ -121,7 +121,7 @@ if __name__ == "__main__":
         <body>
             <h1 style="color: #2c3e50;">这是一封HTML格式的邮件</h1>
             <p style="font-size: 16px; line-height: 1.6;">
-                您好！<br>
+                乌龟您好！<br>
                 这是测试邮件的正文内容，支持：<br>
                 <ul>
                     <li>自定义字体样式</li>

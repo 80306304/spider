@@ -10,8 +10,8 @@ def send_email():
     sender_name = "发件人名称"               # 发件人显示名称
     password = "yaugwzlqvaivbgij"  # 安全获取密码
     receiver_email = "320920643@qq.com"  # 收件邮箱
-    subject = "吃晚饭"                    # 邮件主题
-    body = "我想吃牛肉+炒个青菜"         # 邮件正文
+    subject = "乌龟说话"                    # 邮件主题
+    body = "乌龟说话"         # 邮件正文
 
     try:
         # 创建MIME对象
@@ -58,5 +58,6 @@ def send_email():
 
 if __name__ == "__main__":
     print("=== 邮件发送程序开始 ===")
-    send_email()
+    for i in range(3):
+        send_email()
     print("\n=== 程序执行结束 ===")
