@@ -1,5 +1,6 @@
 {
   "chrome_driver_path": "D:\\self\\chromedriver-win64\\chromedriver.exe",
+  "chrome_driver_path": "C:\\Users\\liyx\\.cache\\selenium\\chromedriver\\win64\\137.0.7151.70\\chromedriver.exe",
   "isPrivacy": true,
   "timeOut": 60,
   "TonPath" : "../record/Ton.txt",

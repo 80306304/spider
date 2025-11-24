@@ -12,7 +12,7 @@ from selenium.webdriver.chrome.service import Service
 
 class driverUtils:
     def __init__(self):
-        with open("../config/baseConfig.json", 'r', encoding='utf-8') as f:
+        with open("./config/baseConfig.json", 'r', encoding='utf-8') as f:
             json_data = json.load(f)
             self.chrome_driver_path = json_data.get("chrome_driver_path")
             self.Privacy = json_data.get("isPrivacy")

@@ -104,7 +104,7 @@ if __name__ == "__main__":
         "smtp_server": "smtp.qq.com",
         "smtp_port": 587,
         "sender_email": "80306304@qq.com",
-        "sender_name": "技术支持",
+        "sender_name": "大鳖速速回话",
         "password": "yaugwzlqvaivbgij",
         "receiver_emails": [
             "320920643@qq.com",
@@ -122,10 +122,14 @@ if __name__ == "__main__":
             <h1 style="color: #2c3e50;">这是一封HTML格式的邮件</h1>
             <p style="font-size: 16px; line-height: 1.6;">
                 乌龟您好！<br>
-                这是测试邮件的正文内容，支持：<br>
+                这是邮件的正文内容，支持：<br>
                 <ul>
-                    <li>自定义字体样式</li>
-                    <li>列表展示</li>
+                    <li>Best Regards,</li>
+                    <li>YUXing Li</li>
+                    <li>Test Engineer</li>
+                    <li>6F, Building B8, Guanggu Biology City, No. 666 Gaoxin Blvd, Wuhan</li>
+                    <li>430063, P.R. China</li>
+                    <li>Tel:86-13972683760</li>
                     <li><a href="https://example.com" style="color: #3498db;">超链接</a></li>
                 </ul>
             </p>
